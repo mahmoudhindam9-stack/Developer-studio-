@@ -1,0 +1,48 @@
+name: Package Developer Studio for Windows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "electron/**"
+      - "src/**"
+      - "package.json"
+      - "index.html"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - ".github/workflows/package-windows.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-installer:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build Windows installer
+        run: npm run dist:win
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Developer-Studio-Windows-Setup
+          path: release/*.exe
+          if-no-files-found: error
+          retention-days: 30
