@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Readex+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -511,7 +512,6 @@ html[data-theme="luxury-gold"] {
 }
 
 
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Readex+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 .studio-toast-viewport {
   position: fixed; z-index: 1000; inset-inline-end: 18px; bottom: 18px;
