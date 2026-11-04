@@ -109,11 +109,18 @@ async function writeDraft(draft: DraftModel): Promise<void> {
   }
 }
 function downloadFile(name: string, content: string, type: string) {
+  const anchor = document.createElement('a');
+  if (/^(https?:\/\/|\/|data:)/i.test(content) && type !== 'application/json') {
+    anchor.href = content;
+    anchor.download = name;
+    anchor.rel = 'noopener';
+    anchor.click();
+    return;
+  }
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
   anchor.href = url; anchor.download = name; anchor.click();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function elementDefaults(kind: ElementKind, pageId: string): ElementModel {
   const base: ElementModel = {
@@ -480,7 +487,7 @@ export default function App() {
       <main className="canvas-workspace">
         <div className="canvas-topline"><div><b>{view === 'edit' ? 'مساحة التصميم' : 'المعاينة الحية'}</b><span>{activePage?.name} · {visibleElements.length} عنصر ظاهر</span></div><div className="canvas-indicators"><span><i/> Auto layout</span><span><i/> Responsive</span><span><i/> Local draft</span></div></div>
         <div className={'canvas-stage ' + viewport}>
-          <div className={'artboard ' + viewport} key={String(draft.updatedAt) + '-' + previewKey + '-' + activePageId} style={{
+          <div className={'artboard ' + viewport} key={String(previewKey) + '-' + activePageId} style={{
             background: draft.design.background, color: draft.design.text, fontFamily: draft.design.fontFamily,
             borderRadius: viewport === 'mobile' ? '26px' : '10px'
           }} onClick={() => view === 'edit' && setSelectedId(null)}>
