@@ -11,9 +11,9 @@
     "web": "vite --host 127.0.0.1",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "dist:win": "npm run build && electron-builder --win nsis",
-    "dist:mac": "npm run build && electron-builder --mac dmg",
-    "dist:linux": "npm run build && electron-builder --linux AppImage"
+    "dist:win": "npm run build && electron-builder --win nsis --publish never",
+    "dist:mac": "npm run build && electron-builder --mac dmg --publish never",
+    "dist:linux": "npm run build && electron-builder --linux AppImage --publish never"
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^1.5.0",
