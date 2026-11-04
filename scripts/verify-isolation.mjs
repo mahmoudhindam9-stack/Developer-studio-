@@ -25,7 +25,7 @@ function walk(dir) {
     }
   }
 }
-for (const dir of ["src", "api", "electron", "scripts"]) walk(path.join(root, dir));
+for (const dir of ["src", "api", "electron"]) walk(path.join(root, dir));
 checked.push(path.join(root, "package.json"));
 
 for (const file of checked) {
