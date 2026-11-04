@@ -203,9 +203,22 @@ export default function App() {
 
   useEffect(() => {
     if (!ready) return;
+    if (draft.savedRevision >= draft.revision) {
+      setSaveState('saved');
+      return;
+    }
     setSaveState('saving');
+    const snapshot = { ...draft, savedRevision: draft.revision };
     const timeout = window.setTimeout(() => {
-      writeDraft(draft).then(() => setSaveState('saved')).catch(() => {
+      writeDraft(snapshot).then(() => {
+        setDraft(current =>
+          current.revision === snapshot.revision &&
+          current.savedRevision !== snapshot.savedRevision
+            ? snapshot
+            : current
+        );
+        setSaveState('saved');
+      }).catch(() => {
         setSaveState('error');
         setNotice('تعذر الحفظ المحلي. تحقق من مساحة التخزين في المتصفح.');
       });
