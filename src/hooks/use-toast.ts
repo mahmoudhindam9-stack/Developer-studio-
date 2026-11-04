@@ -30,11 +30,21 @@ export function ToastViewport() {
     return () => { listeners.delete(listener); };
   }, []);
   if (!items.length) return null;
-  return <div className="studio-toast-viewport" aria-live="polite">
-    {items.map(item => <div key={item.id} className={"studio-toast " + (item.variant === "destructive" ? "danger" : "")}>
-      <button type="button" className="studio-toast-close" onClick={() => setItems(current => current.filter(x => x.id !== item.id))}>×</button>
-      {item.title && <strong>{item.title}</strong>}
-      {item.description && <p>{item.description}</p>}
-    </div>)}
-  </div>;
+  return React.createElement(
+    "div",
+    { className: "studio-toast-viewport", "aria-live": "polite" },
+    ...items.map(item =>
+      React.createElement(
+        "div",
+        { key: item.id, className: "studio-toast " + (item.variant === "destructive" ? "danger" : "") },
+        React.createElement("button", {
+          type: "button",
+          className: "studio-toast-close",
+          onClick: () => setItems(current => current.filter(x => x.id !== item.id))
+        }, "×"),
+        item.title ? React.createElement("strong", null, item.title) : null,
+        item.description ? React.createElement("p", null, item.description) : null
+      )
+    )
+  );
 }
