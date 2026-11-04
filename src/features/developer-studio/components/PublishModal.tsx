@@ -106,8 +106,8 @@ export function PublishModal({
       if (res.success) {
         setPublishResult({ success: true, revision: res.newRevision });
         toast({
-          title: "تم النشر والتأكيد السحابي بنجاح",
-          description: `تم التحقق من الإصدار المنشور رقم #${res.newRevision} على Supabase وتفعيله في التطبيق.`,
+          title: "تم حفظ ونشر الإصدار محلياً بنجاح",
+          description: `تم اعتماد الإصدار المحلي رقم #${res.newRevision} وتفعيله في معاينة الاستوديو.`,
         });
         const refreshedDraft = await studioService.getDraft(draft.owner);
         setTimeout(() => {
@@ -125,7 +125,7 @@ export function PublishModal({
             offline: res.offline,
           });
           toast({
-            title: "فشل النشر السحابي — لم يتم تعديل النسخة الحية",
+            title: "تعذر نشر الإصدار المحلي — لم يتم تغيير النسخة المنشورة",
             description:
               (res.error || "حدث خطأ أثناء الاتصال بالخادم.") +
               " تم الحفاظ على المسودة المحلية بالكامل.",
@@ -157,7 +157,7 @@ export function PublishModal({
             <UploadCloud className="w-5 h-5 text-primary shrink-0" />
           </div>
           <DialogDescription className="text-xs text-muted-foreground">
-            يقوم الاستوديو أولاً بحفظ وتأكيد أحدث مسودة على Supabase، ثم ينشر اللقطة المحفوظة ذرّياً ويتحقق من الإصدار الجديد على الخادم قبل تحديث التطبيق الحي.
+            يقوم الاستوديو أولاً بحفظ وتأكيد أحدث مسودة في مساحة الاستوديو المحلية، ثم ينشر اللقطة المحفوظة ذرّياً ويتحقق من الإصدار الجديد على الخادم قبل تحديث التطبيق الحي.
           </DialogDescription>
         </DialogHeader>
 
@@ -289,7 +289,7 @@ export function PublishModal({
                 htmlFor="confirmPublish"
                 className="text-xs text-foreground cursor-pointer select-none font-medium"
               >
-                أؤكد اعتماد ونشر هذا المخطط بعد التحقق السحابي، مع حفظ النسخة السابقة للاسترجاع الآمن (Pre-Publish Rollback Point).
+                أؤكد اعتماد ونشر هذا المخطط بعد التحقق المحلي، مع حفظ النسخة السابقة للاسترجاع الآمن (Pre-Publish Rollback Point).
               </label>
             </div>
           </div>
@@ -346,7 +346,7 @@ export function PublishModal({
             {isPublishing ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>جاري الحفظ والنشر والتحقق السحابي...</span>
+                <span>جارٍ حفظ الإصدار ونشره محلياً...</span>
               </>
             ) : (
               <>

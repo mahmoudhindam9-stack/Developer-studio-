@@ -509,6 +509,7 @@ export const studioService = {
       id: draft.id,
       owner: draft.owner,
       baseRevision: remote.revision,
+      createdAt: draft.createdAt,
       pages: { ...clone(remote.pages), ...clone(draft.pages) },
       elements: { ...clone(remote.elements), ...clone(draft.elements) },
       domEdits: { ...clone(remote.domEdits || {}), ...clone(draft.domEdits || {}) },
@@ -528,7 +529,13 @@ export const studioService = {
   async publishDraft(draft: StudioDraft, summary = "نشر تحديث الاستوديو", author = "local-user") {
     const validation = validateDraftHierarchy(draft);
     if (!validation.valid) {
-      return { success: false, error: validation.errors.join(" • "), newRevision: ensureState().publishedConfig.revision };
+      return {
+        success: false,
+        error: validation.errors.join(" • "),
+        newRevision: ensureState().publishedConfig.revision,
+        conflict: false,
+        offline: false,
+      };
     }
     const current = ensureState();
     const revision = Math.max(current.publishedConfig.revision, ...current.history.map(item => item.revision)) + 1;
@@ -560,7 +567,7 @@ export const studioService = {
     current.draft = clone(saved);
     current.history.push(newHistoryRecord(saved, revision, summary));
     persist();
-    return { success: true, newRevision: revision, publishedAt: stamp };
+    return { success: true, newRevision: revision, publishedAt: stamp, conflict: false, offline: false };
   },
 
   async rollbackRevision(revision: number, _author = "local-user") {
@@ -609,6 +616,7 @@ export const studioService = {
       note,
       snapshot: {
         ...snapshotFromDraft(draft),
+        domEdits: clone(draft.domEdits || {}),
         assets: clone(draft.assets || []),
         reusableComponents: clone(draft.reusableComponents || []),
       },

@@ -1,14 +1,24 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
+
+type ApiRequest = IncomingMessage & { body?: any; method?: string };
+type ApiResponse = ServerResponse & { status(code: number): ApiResponse };
+type GeminiPart = { text?: string };
+type GeminiResponse = {
+  error?: { message?: string };
+  candidates?: Array<{ content?: { parts?: GeminiPart[] } }>;
+};
+
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS_PER_WINDOW = 8;
 const requestCounts = new Map();
 
-function reply(res, statusCode, payload) {
+function reply(res: ApiResponse, statusCode: number, payload: unknown): void {
   res.status(statusCode).setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
   res.end(JSON.stringify(payload));
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: ApiRequest, res: ApiResponse): Promise<void> {
   if (req.method === "OPTIONS") {
     res.status(204).setHeader("Allow", "POST, OPTIONS").end();
     return;
@@ -76,12 +86,12 @@ export default async function handler(req, res) {
         signal: AbortSignal.timeout(25_000)
       }
     );
-    const body = await response.json().catch(() => ({}));
+    const body = await response.json().catch(() => ({} as GeminiResponse)) as GeminiResponse;
     if (!response.ok) {
       reply(res, 502, { ok: false, error: body.error?.message || "Gemini request failed." });
       return;
     }
-    const text = body.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("").trim();
+    const text = body.candidates?.[0]?.content?.parts?.map((part: GeminiPart) => part.text || "").join("").trim();
     if (!text) {
       reply(res, 502, { ok: false, error: "لم يرجع Gemini مقترحاً صالحاً." });
       return;
@@ -97,7 +107,8 @@ export default async function handler(req, res) {
       domEditPatch: parsed.domEditPatch && typeof parsed.domEditPatch === "object" ? parsed.domEditPatch : null,
       model
     });
-  } catch (error) {
-    reply(res, 502, { ok: false, error: error?.message || "تعذر الاتصال بمساعد التصميم." });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "تعذر الاتصال بمساعد التصميم.";
+    reply(res, 502, { ok: false, error: message });
   }
 }

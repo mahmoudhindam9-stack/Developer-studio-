@@ -105,7 +105,7 @@ export function HistoryRollbackModal({
         onClose();
       } else {
         toast({
-          title: "فشل الاسترجاع السحابي",
+          title: "فشل الاسترجاع المحلي",
           description: res.error || "تعذر استرجاع لقطة الإصدار المحدد.",
           variant: "destructive",
         });
