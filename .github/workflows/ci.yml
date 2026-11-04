@@ -16,6 +16,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+      - name: Verify Juba isolation
+        run: npm run verify:isolation
       - name: Type check
         run: npm run typecheck
       - name: Build renderer
