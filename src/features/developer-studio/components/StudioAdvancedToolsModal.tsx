@@ -4,7 +4,7 @@
  * 1. Command Palette (`Ctrl+K`)
  * 2. Find & Replace (across text, labels, links, and colors)
  * 3. Audits Suite (Accessibility, Responsive, and Design Consistency with 1-click Auto-Fix)
- * 4. Change Comparison (Local Unsaved Draft vs Last Saved Cloud Draft vs Published Live Version)
+ * 4. Change Comparison (Local Unsaved Draft vs Last Saved Local Draft vs Locally Published Version)
  * 5. Project Export / Import (Versioned JSON with Schema Validation)
  * 6. Safe Code Inspector (Clean generated JSX/HTML & CSS tokens)
  * 7. AI Design Assistant (Draft-only layout, color, accessibility, and RTL suggestions)
@@ -156,7 +156,7 @@ export function StudioAdvancedToolsModal({
     const items: Array<{ id: string; title: string; category: string; action: () => void }> = [
       {
         id: "cmd_save",
-        title: "حفظ ومزامنة المسودة على Supabase (Ctrl+S)",
+        title: "حفظ المسودة محلياً (Ctrl+S)",
         category: "الإجراءات الأساسية",
         action: () => {
           onClose();
@@ -165,7 +165,7 @@ export function StudioAdvancedToolsModal({
       },
       {
         id: "cmd_publish",
-        title: "نشر التعديلات بعد التحقق السحابي (Publish)",
+        title: "اعتماد الإصدار المحلي (Publish)",
         category: "الإجراءات الأساسية",
         action: () => {
           onClose();
@@ -477,7 +477,7 @@ export function StudioAdvancedToolsModal({
     onUpdateDraft(res.draft, "استيراد ملف مشروع JSON");
     toast({
       title: "تم استيراد المشروع في المسودة بنجاح",
-      description: "راجع المعاينة ثم اضغط «حفظ ومزامنة» لتأكيدها على Supabase.",
+      description: "راجع المعاينة ثم اضغط «حفظ المسودة» لتخزين التعديلات في هذا المتصفح.",
     });
     onClose();
   };
@@ -1017,7 +1017,7 @@ export function StudioAdvancedToolsModal({
                   onClick={() => setDiffMode("draft_vs_saved")}
                   className="h-7 text-[10px]"
                 >
-                  المسودة ↔ المحفوظ سحابياً
+                  المسودة ↔ المحفوظ محلياً
                 </Button>
                 <Button
                   type="button"
@@ -1026,7 +1026,7 @@ export function StudioAdvancedToolsModal({
                   onClick={() => setDiffMode("saved_vs_published")}
                   className="h-7 text-[10px]"
                 >
-                  السحابي ↔ المنشور
+                  المحفوظ محلياً ↔ المنشور
                 </Button>
               </div>
               <Badge variant="outline">{activeDiffs.length} فرق</Badge>
@@ -1161,7 +1161,7 @@ export function StudioAdvancedToolsModal({
           </div>
         )}
 
-        {/* 7. AI DESIGN ASSISTANT (Live Gemini Server-Side + Built-in Presets) */}
+        {/* 7. AI DESIGN ASSISTANT (Independent Gemini endpoint + Built-in Presets) */}
         {activeTab === "ai" && (
           <div className="flex-1 overflow-y-auto space-y-3 p-3 text-xs">
             <StudioSectionSaveDiscardBar
@@ -1286,7 +1286,7 @@ export function StudioAdvancedToolsModal({
           <div className="flex-1 overflow-y-auto p-3 text-xs">
             <div className="space-y-2">
               {[
-                ["Ctrl + S", "حفظ ومزامنة المسودة على Supabase"],
+                ["Ctrl + S", "حفظ المسودة محلياً"],
                 ["Ctrl + Z", "تراجع عن آخر تعديل في المسودة (Undo)"],
                 ["Ctrl + Shift + Z", "إعادة التعديل المتراجع عنه (Redo)"],
                 ["Ctrl + K", "فتح لوحة الأوامر السريعة"],

@@ -1,6 +1,6 @@
 /**
  * Developer Studio Pro — Concurrency Conflict Resolution Workflow
- * Handles optimistic concurrency conflicts (baseRevision < serverRevision)
+ * Handles local revision conflicts (baseRevision < publishedRevision)
  * Offers Reload Latest, Smart Merge (preserving non-conflicting edits),
  * and Manual Compare/Override with explicit confirmation.
  */
@@ -56,13 +56,13 @@ export function ConflictResolutionModal({
   const [activeView, setActiveView] = useState<"list" | "compare">("list");
   const [overrideConfirmed, setOverrideConfirmed] = useState(false);
 
-  // 1. Reload latest from server (discard local draft)
+  // 1. Reload the latest locally published snapshot (discard local draft)
   const handleReloadLatest = async () => {
     setIsProcessing(true);
     try {
       const freshDraft = await studioService.reloadLatestPublishedDraft(draft.owner);
       toast({
-        title: "تم استرجاع أحدث إصدار من الخادم",
+        title: "تم استرجاع أحدث إصدار منشور محلياً",
         description: `تم تحديث مساحة العمل لتطابق الإصدار الحالي #${freshDraft.baseRevision}.`,
       });
       onResolved(freshDraft);
@@ -78,7 +78,7 @@ export function ConflictResolutionModal({
     }
   };
 
-  // 2. Smart Merge (combine non-conflicting changes with latest published config)
+  // 2. Smart Merge (combine non-conflicting local draft and published changes)
   const handleSmartMerge = async () => {
     setIsProcessing(true);
     try {
@@ -117,7 +117,7 @@ export function ConflictResolutionModal({
       onResolved(updatedDraft);
       toast({
         title: "تم تحديث مرجع المسودة محليًا",
-        description: `لم يتم حفظ التعديلات تلقائيًا. اضغط «حفظ المسودة» لتأكيد الإصدار المرجعي #${serverRevision} على Supabase.`,
+        description: `لم يتم حفظ التعديلات تلقائيًا. اضغط «حفظ المسودة» لتأكيد الإصدار المرجعي #${serverRevision} في المخزن المحلي.`,
       });
       onClose();
     } catch (e: any) {
@@ -145,7 +145,7 @@ export function ConflictResolutionModal({
             </DialogTitle>
           </div>
           <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-            تم نشر إصدار أحدث على الخادم (رقم #{serverRevision}) بواسطة مستخدم آخر منذ بدء جلسة التعديل الحالية. تم الحفاظ على مسودتك بالكامل دون فقدان أي بيانات.
+            يوجد إصدار محلي أحدث (رقم #{serverRevision}) عن الإصدار المرجعي للمسودة الحالية. تم الحفاظ على المسودة بالكامل دون فقدان أي بيانات.
           </DialogDescription>
         </DialogHeader>
 
@@ -179,7 +179,7 @@ export function ConflictResolutionModal({
                   <span>الدمج الذكي (Smart Merge)</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  الحفاظ على تعديلاتك الحالية مع استيعاب صفحات وتعديلات الخادم الجديدة غير المتعارضة تلقائياً.
+                  الحفاظ على تعديلات المسودة الحالية ودمج التغييرات غير المتعارضة من آخر إصدار محفوظ محلياً.
                 </p>
               </div>
               <Button
@@ -202,7 +202,7 @@ export function ConflictResolutionModal({
                   <span>تحميل الأحدث (Reload Latest)</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  إلغاء التعديلات المحلية غير المنشورة واستعادة الحالة المنشورة رسمياً على الخادم (#{serverRevision}).
+                  إلغاء التعديلات المحلية غير المنشورة واستعادة آخر إصدار محفوظ محلياً (#{serverRevision}).
                 </p>
               </div>
               <Button

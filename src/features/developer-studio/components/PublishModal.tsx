@@ -1,7 +1,7 @@
 /**
- * Developer Studio Pro — Server-Confirmed Publish Workflow Modal
+ * Developer Studio Pro — Local Version Publish Workflow Modal
  * Performs pre-flight schema validation, change diff summary, automatic save-before-publish,
- * server-confirmed atomic publish with authoritative verification, and retry on failure.
+ * local version snapshot creation, integrity validation, and retry on local storage failure.
  */
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -121,13 +121,13 @@ export function PublishModal({
         } else {
           setPublishResult({
             success: false,
-            error: res.error || "لم يؤكد الخادم عملية النشر.",
+            error: res.error || "تعذر اعتماد الإصدار في المخزن المحلي.",
             offline: res.offline,
           });
           toast({
             title: "تعذر نشر الإصدار المحلي — لم يتم تغيير النسخة المنشورة",
             description:
-              (res.error || "حدث خطأ أثناء الاتصال بالخادم.") +
+              (res.error || "حدث خطأ أثناء حفظ الإصدار المحلي.") +
               " تم الحفاظ على المسودة المحلية بالكامل.",
             variant: "destructive",
           });
@@ -136,7 +136,7 @@ export function PublishModal({
     } catch (e: any) {
       setPublishResult({
         success: false,
-        error: e?.message || "تعذر الاتصال بالخادم لإتمام النشر.",
+        error: e?.message || "تعذر إتمام النشر في المخزن المحلي.",
       });
     } finally {
       setIsPublishing(false);
@@ -152,12 +152,12 @@ export function PublishModal({
               Rev #{draft.baseRevision} → #{targetRevision}
             </Badge>
             <DialogTitle className="text-lg font-black text-foreground">
-              تأكيد ونشر التعديلات (Server-Confirmed Publish)
+              اعتماد ونشر الإصدار المحلي
             </DialogTitle>
             <UploadCloud className="w-5 h-5 text-primary shrink-0" />
           </div>
           <DialogDescription className="text-xs text-muted-foreground">
-            يقوم الاستوديو أولاً بحفظ وتأكيد أحدث مسودة في مساحة الاستوديو المحلية، ثم ينشر اللقطة المحفوظة ذرّياً ويتحقق من الإصدار الجديد على الخادم قبل تحديث التطبيق الحي.
+            يحفظ الاستوديو المسودة في مساحة التخزين المحلية، ثم ينشئ لقطة إصدار مستقلة في سجل هذا المتصفح ويحدّث معاينة الاستوديو. لا تُرسل هذه العملية أي بيانات إلى Juba أو إلى قاعدة بيانات خارجية.
           </DialogDescription>
         </DialogHeader>
 
@@ -167,7 +167,7 @@ export function PublishModal({
             <div className="bg-blue-500/10 border border-blue-500/25 text-blue-800 dark:text-blue-200 p-2.5 rounded-xl text-xs flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
               <span>
-                توجد تعديلات محلية غير متزامنة: سيقوم زر النشر بحفظها وتأكيدها على Supabase أولاً قبل نشرها.
+                توجد تعديلات محلية غير محفوظة: سيحفظها الاستوديو أولاً في مساحة هذا المتصفح ثم ينشئ الإصدار المحلي.
               </span>
             </div>
           )}
@@ -177,7 +177,7 @@ export function PublishModal({
             <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 p-3 rounded-xl text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-bold">المخطط سليم وجاهز للنشر المؤكد (100% Validated)</span>
+                <span className="font-bold">المخطط سليم وجاهز لاعتماد الإصدار المحلي (100% Validated)</span>
               </div>
               <Badge variant="secondary" className="text-[10px]">
                 {pageCount} صفحات • {elementCount} عناصر • {domEditCount} تعديل حي
@@ -301,7 +301,7 @@ export function PublishModal({
                 <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
                 <div className="flex-1 space-y-1">
                   <p className="font-bold">
-                    فشل النشر على الخادم — لم يتم تغيير النسخة المنشورة ومسودتك محفوظة بالكامل:
+                    تعذر اعتماد الإصدار المحلي — لم تتغير آخر نسخة محفوظة، ومسودتك ما زالت محفوظة بالكامل:
                   </p>
                   <p className="text-[11px] leading-relaxed break-words">{publishResult.error}</p>
                 </div>

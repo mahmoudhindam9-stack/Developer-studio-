@@ -5,7 +5,7 @@
  * 2. Creating and restoring named local/draft checkpoints (`namedSnapshots`)
  * 3. Restoring any version into the active draft WITHOUT deleting current history or overwriting live config
  * 4. Comparing any historical revision/checkpoint against the current draft
- * 5. Atomic server-confirmed rollback publication
+ * 5. Local rollback publication into the independent version history
  */
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -534,7 +534,7 @@ export function HistoryRollbackModal({
               <span>هل أنت متأكد من نشر استعادة الإصدار رقم #{targetRecord.revision}؟</span>
             </div>
             <p className="text-muted-foreground text-[11px] leading-relaxed">
-              سيتم إنشاء إصدار منشور جديد على الخادم يحمل محتويات اللقطة رقم #{targetRecord.revision} مع الاحتفاظ بجميع الإصدارات السابقة في السجل.
+              سيتم إنشاء إصدار محلي جديد يحمل محتويات اللقطة رقم #{targetRecord.revision} داخل سجل هذا المتصفح، مع الاحتفاظ بجميع الإصدارات السابقة.
             </p>
             <div className="flex items-center justify-end gap-2 pt-1">
               <Button
