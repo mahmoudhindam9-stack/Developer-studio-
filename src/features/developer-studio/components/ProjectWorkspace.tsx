@@ -117,6 +117,18 @@ export function ProjectWorkspace() {
         appendLog("تعذر فتح الملف الأولي: " + (error?.message || String(error)));
       }
     }
+    if (nextScripts.build && window.confirm("تم فتح المشروع. هل تريد تثبيت المتطلبات وتشغيل البناء الآن؟ يتم تنفيذ أوامر المشروع بعد موافقتك فقط؛ تابع مع الملفات التي تثق بمصدرها.")) {
+      setLogs(["بدء تجهيز المشروع..."]);
+      buildAfterInstall.current = true;
+      try {
+        await window.developerStudio.installDependencies();
+      } catch (error: any) {
+        buildAfterInstall.current = false;
+        setBusy(false);
+        setBusyLabel("");
+        appendLog("تعذر بدء تثبيت المتطلبات: " + (error?.message || String(error)));
+      }
+    }
   }, [appendLog]);
 
   useEffect(() => {
