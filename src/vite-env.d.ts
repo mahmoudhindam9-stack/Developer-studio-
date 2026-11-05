@@ -4,6 +4,11 @@ declare global {
   interface Window {
     developerStudio: {
       chooseProject(): Promise<{ root: string; name: string; tree: StudioTreeItem[]; recentProjects: string[] } | null>;
+      importArchive(): Promise<{ root: string; name: string; tree: StudioTreeItem[]; recentProjects: string[] } | null>;
+      exportArchive(): Promise<{ filePath: string; fileCount: number; bytes: number } | null>;
+      installDependencies(): Promise<{ id: string; kind: string }>;
+      saveToGitHub(options: { remoteUrl?: string; branch?: string; message?: string }): Promise<{ success: boolean; remoteUrl: string; branch: string }>;
+      createGitHubProject(options: { name: string; visibility?: "private" | "public"; message?: string }): Promise<{ success: boolean; url: string; remoteUrl: string; output: string }>;
       openRecentProject(path: string): Promise<{ root: string; name: string; tree: StudioTreeItem[]; recentProjects: string[] }>;
       getProjectTree(): Promise<StudioTreeItem[]>;
       readFile(path: string): Promise<{ path: string; content: string; size: number }>;
