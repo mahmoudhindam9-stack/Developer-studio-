@@ -16,6 +16,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+      - name: Validate Electron runtime syntax
+        run: node --check electron/main.mjs && node --check electron/preload.cjs
       - name: Verify Juba isolation
         run: npm run verify:isolation
       - name: Type check

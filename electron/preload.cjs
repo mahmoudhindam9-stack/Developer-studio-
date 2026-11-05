@@ -10,6 +10,11 @@ ipcRenderer.on('studio:event', (_event, payload) => {
 
 contextBridge.exposeInMainWorld('developerStudio', Object.freeze({
   chooseProject: invoke('project:choose'),
+  importArchive: invoke('project:importArchive'),
+  exportArchive: invoke('project:exportArchive'),
+  installDependencies: invoke('project:installDependencies'),
+  saveToGitHub: invoke('git:saveToGitHub'),
+  createGitHubProject: invoke('git:createGitHubProject'),
   openRecentProject: invoke('project:openRecent'),
   getProjectTree: invoke('project:tree'),
   readFile: invoke('project:readFile'),

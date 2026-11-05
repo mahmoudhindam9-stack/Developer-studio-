@@ -1,6 +1,6 @@
 import React from "react";
-import { DeveloperStudioPro } from "./DeveloperStudioPro";
+import { ProjectWorkspace } from "./features/developer-studio/components/ProjectWorkspace";
 
 export default function App() {
-  return <DeveloperStudioPro />;
+  return <ProjectWorkspace />;
 }
