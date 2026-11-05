@@ -180,7 +180,7 @@ async function ensureGitRepo(branchName){
  }
 }
 async function stageAndCommit(message){
- const add=await gitResult(['add','--all','--','.',' :(exclude)**/.env',' :(exclude)**/.env.*',' :(exclude)**/node_modules/**',' :(exclude)**/.git/**',' :(exclude)**/.developer-studio/**']);
+ const add=await gitResult(['add','--all','--','.',':(exclude)**/.env',':(exclude)**/.env.*',':(exclude)**/node_modules/**',':(exclude)**/.git/**',':(exclude)**/.developer-studio/**']);
  if(add.code!==0)throw Error(add.stderr||'Git staging failed.');
  const diff=await gitResult(['diff','--cached','--quiet']);
  if(diff.code===1){
@@ -199,18 +199,21 @@ function validateGithubRemote(value){
 }
 async function saveProjectToGithub(options={}){
  if(!root)throw Error('Open a project first.');
+ if(task)throw Error('Stop the running project task before saving to GitHub.');
  const remoteInput=String(options.remoteUrl||'').trim();
- const branchName=String(options.branch||'main').trim()||'main';
+ const requestedBranch=String(options.branch||'').trim();
+ await ensureGitRepo(requestedBranch||'main');
+ const currentBranch=await gitResult(['branch','--show-current']);
+ const branchName=requestedBranch||currentBranch.stdout.trim()||'main';
  const message=String(options.message||'Update project from Developer Studio').trim().slice(0,160);
  if(!message)throw Error('Enter a commit message.');
- await ensureGitRepo(branchName);
+ if(!currentBranch.stdout.trim()||requestedBranch)await git(['branch','-M',branchName]);
  const current=await gitResult(['remote','get-url','origin']);
  if(remoteInput){
   const remote=validateGithubRemote(remoteInput);
   if(current.code===0)await git(['remote','set-url','origin',remote]);
   else await git(['remote','add','origin',remote]);
  }else if(current.code!==0)throw Error('This project has no origin remote. Enter the existing GitHub repository URL.');
- await git(['branch','-M',branchName]);
  await stageAndCommit(message);
  const pushed=await gitResult(['push','-u','origin',branchName]);
  if(pushed.code!==0)throw Error(pushed.stderr||pushed.stdout||'GitHub push failed. Check your Git credentials and repository permissions.');
