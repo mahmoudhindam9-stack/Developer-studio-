@@ -286,7 +286,7 @@ export function ProjectWorkspace() {
     try {
       let result;
       if (saveMode === "existing") {
-        result = await window.developerStudio.saveToGitHub({ remoteUrl, branch: "main", message: commitMessage });
+        result = await window.developerStudio.saveToGitHub({ remoteUrl, message: commitMessage });
       } else {
         result = await window.developerStudio.createGitHubProject({ name: repoName, visibility, message: commitMessage });
       }
@@ -352,7 +352,6 @@ export function ProjectWorkspace() {
             </section>
           )}
         </main>
-        <footer className="studio-home-footer"><ShieldCheck size={14}/> مساحة مستقلة · ملفاتك تبقى على جهازك</footer>
       </div>
     );
   }
