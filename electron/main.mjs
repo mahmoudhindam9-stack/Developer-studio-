@@ -180,7 +180,7 @@ async function ensureGitRepo(branchName){
  }
 }
 async function stageAndCommit(message){
- const add=await gitResult(['add','--all','--','.',':(exclude)**/.env',':(exclude)**/.env.*',':(exclude)**/node_modules/**',':(exclude)**/.git/**',':(exclude)**/.developer-studio/**']);
+ const add=await gitResult(['add','--all','--','.',':(exclude,glob)**/.env',':(exclude,glob)**/.env.*',':(exclude,glob)**/node_modules/**',':(exclude,glob)**/.git/**',':(exclude,glob)**/.developer-studio/**']);
  if(add.code!==0)throw Error(add.stderr||'Git staging failed.');
  const diff=await gitResult(['diff','--cached','--quiet']);
  if(diff.code===1){
