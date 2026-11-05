@@ -135,12 +135,15 @@ export function ProjectWorkspace() {
         const success = Number(event.code) === 0;
         appendLog(success ? "✓ انتهت العملية بنجاح." : "✕ انتهت العملية بكود " + event.code + ".");
         if (event.error) appendLog(String(event.error));
-        if (event.kind === "install" && success && buildAfterInstall.current) {
+        if (event.kind === "install") {
+          const shouldBuild = success && buildAfterInstall.current;
           buildAfterInstall.current = false;
-          void window.developerStudio.runTask("build").catch((error: any) => {
-            setBusy(false);
-            appendLog("تعذر بدء البناء: " + (error?.message || String(error)));
-          });
+          if (shouldBuild) {
+            void window.developerStudio.runTask("build").catch((error: any) => {
+              setBusy(false);
+              appendLog("تعذر بدء البناء: " + (error?.message || String(error)));
+            });
+          }
         }
         if (event.kind === "build" || event.kind === "install") {
           setStatusMessage(success ? "آخر عملية اكتملت بنجاح" : "آخر عملية انتهت بخطأ؛ راجع سجل العمليات");
