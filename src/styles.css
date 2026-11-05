@@ -94,8 +94,9 @@ html[data-theme="pearl-4k"] {
 }
 
 /* ============================================================================
-   2. EYE-CARE WARM 4K (Zero Blue-Light Warm Silk & Deep Jade — Anti-Eye-Strain)
+   2. EYE-CARE WARM IVORY (Light 3 — Warm Silk & Deep Amber-Jade)
    ============================================================================ */
+html[data-theme="warm-ivory"],
 html[data-theme="eye-care"] {
   --background: #f2efe9;
   --foreground: #1c1917;
@@ -127,7 +128,7 @@ html[data-theme="eye-care"] {
 }
 
 /* ============================================================================
-   3. CRYSTAL SAPPHIRE 4K (Nordic Financial Ice & Royal Sapphire Blue)
+   3. CRYSTAL SAPPHIRE 4K (Light 2 — Nordic Financial Ice & Royal Sapphire Blue)
    ============================================================================ */
 html[data-theme="crystal-blue"] {
   --background: #eef3f9;
@@ -157,6 +158,39 @@ html[data-theme="crystal-blue"] {
   --chart-3: #d97706;
   --chart-4: #e11d48;
   --chart-5: #7c3aed;
+}
+
+/* ============================================================================
+   4. MODERN VIOLET & MINT (Light 4 — Violet Modern & Mint)
+   ============================================================================ */
+html[data-theme="modern-violet"] {
+  --background: #f5f3ff;
+  --foreground: #1e1b4b;
+  --card: #ffffff;
+  --card-foreground: #1e1b4b;
+  --popover: #ffffff;
+  --popover-foreground: #1e1b4b;
+  --primary: #6d28d9;
+  --primary-foreground: #ffffff;
+  --primary-glow: #8b5cf6;
+  --secondary: #ede9fe;
+  --secondary-foreground: #3730a3;
+  --muted: #f3e8ff;
+  --muted-foreground: #5b21b6;
+  --accent: #f0fdf4;
+  --accent-foreground: #15803d;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #ddd6fe;
+  --input: #ddd6fe;
+  --ring: #6d28d9;
+  --shadow-card: 0 1px 3px rgba(30, 27, 75, 0.06), 0 8px 24px -6px rgba(109, 40, 217, 0.08);
+  --shadow-elegant: 0 16px 36px -10px rgba(109, 40, 217, 0.22);
+  --chart-1: #6d28d9;
+  --chart-2: #059669;
+  --chart-3: #d97706;
+  --chart-4: #e11d48;
+  --chart-5: #2563eb;
 }
 
 /* ============================================================================
@@ -634,15 +668,15 @@ body { overflow: hidden; }
   font-size: 11px;
 }
 .studio-import-options {
-  width: min(620px, calc(100vw - 36px));
-  padding: 26px;
+  width: min(560px, calc(100vw - 36px));
+  padding: 20px;
   border: 1px solid rgba(148, 163, 184, .2);
   border-radius: 22px;
   background: linear-gradient(145deg, rgba(20, 31, 47, .97), rgba(13, 23, 36, .97));
   box-shadow: 0 28px 90px rgba(0,0,0,.38);
 }
-.studio-import-options-title { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-.studio-import-options-title h1 { margin: 0; color: #f4f7fd; font-size: 18px; font-weight: 800; }
+.studio-import-options-title { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.studio-import-options-title h1 { margin: 0; color: #f4f7fd; font-size: 17px; font-weight: 800; }
 .studio-import-options-title p { margin: 4px 0 0; color: #92a0b4; font-size: 12px; }
 .studio-back-icon {
   display: grid;
@@ -658,11 +692,11 @@ body { overflow: hidden; }
 .studio-source-option {
   display: flex;
   width: 100%;
-  min-height: 80px;
+  min-height: 60px;
   align-items: center;
-  gap: 15px;
-  margin-top: 10px;
-  padding: 14px 16px;
+  gap: 14px;
+  margin-top: 9px;
+  padding: 10px 15px;
   border: 1px solid rgba(148, 163, 184, .19);
   border-radius: 15px;
   color: #dfe8f5;
@@ -672,8 +706,8 @@ body { overflow: hidden; }
 }
 .studio-source-option:hover { border-color: rgba(112,220,187,.5); background: rgba(38,112,91,.12); }
 .studio-source-option:disabled { opacity: .55; cursor: wait; }
-.studio-source-option > span:nth-child(2) { display: grid; flex: 1; gap: 5px; }
-.studio-source-option strong { font-size: 13px; font-weight: 800; }
+.studio-source-option > span:nth-child(2) { display: grid; flex: 1; gap: 2px; }
+.studio-source-option strong { font-size: 14px; font-weight: 800; }
 .studio-source-option small { color: #8f9db2; font-size: 11px; }
 .studio-source-option > svg:last-child { color: #8091a8; }
 .studio-source-icon {
