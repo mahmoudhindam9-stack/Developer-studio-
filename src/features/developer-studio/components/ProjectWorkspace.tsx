@@ -77,6 +77,7 @@ export function ProjectWorkspace() {
   const [treeQuery, setTreeQuery] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const buildAfterInstall = useRef(false);
+  const taskRunning = useRef(false);
   const editorRef = useRef<any>(null);
   const dirty = fileContent !== savedContent;
   const nativeAvailable = typeof window !== "undefined" && !!window.developerStudio;
@@ -135,6 +136,7 @@ export function ProjectWorkspace() {
     if (!nativeAvailable) return;
     return window.developerStudio.onEvent((event) => {
       if (event.type === "task:started") {
+        taskRunning.current = true;
         setBusy(true);
         setBusyLabel(event.kind === "install" ? "تثبيت المتطلبات" : event.kind === "build" ? "بناء المشروع" : "تشغيل المشروع");
         appendLog("$ " + (event.command || event.kind));
@@ -142,6 +144,7 @@ export function ProjectWorkspace() {
         const lines = String(event.text || "").replace(/\r/g, "").split("\n").filter(Boolean);
         lines.forEach((line: string) => appendLog(line));
       } else if (event.type === "task:finished") {
+        taskRunning.current = false;
         setBusy(false);
         setBusyLabel("");
         const success = Number(event.code) === 0;
@@ -227,8 +230,10 @@ export function ProjectWorkspace() {
     } catch (error: any) {
       appendLog("تعذر استيراد المجلد: " + (error?.message || String(error)));
     } finally {
-      setBusy(false);
-      setBusyLabel("");
+      if (!taskRunning.current) {
+        setBusy(false);
+        setBusyLabel("");
+      }
     }
   };
 
@@ -246,8 +251,10 @@ export function ProjectWorkspace() {
     } catch (error: any) {
       appendLog("تعذر استيراد الأرشيف: " + (error?.message || String(error)));
     } finally {
-      setBusy(false);
-      setBusyLabel("");
+      if (!taskRunning.current) {
+        setBusy(false);
+        setBusyLabel("");
+      }
     }
   };
 
