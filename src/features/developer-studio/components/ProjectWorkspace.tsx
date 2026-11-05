@@ -102,7 +102,7 @@ export function ProjectWorkspace() {
     setSavedContent("");
     setLogs([]);
     setStatusMessage("تم فتح المشروع محلياً");
-    const nextScripts = await window.developerStudio.getScripts().catch(() => ({}));
+    const nextScripts: Record<string, string> = await window.developerStudio.getScripts().catch((): Record<string, string> => ({}));
     setScripts(nextScripts);
     const files = flattenFiles(result.tree).filter((item) => item.type === "file");
     const preferred = files.find((item) => item.path === "package.json")
