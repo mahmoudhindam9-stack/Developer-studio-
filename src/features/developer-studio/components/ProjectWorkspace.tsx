@@ -292,7 +292,7 @@ export function ProjectWorkspace() {
       }
       setShowSaveDialog(false);
       setStatusMessage("تم رفع المشروع إلى GitHub");
-      appendLog("GitHub: " + (result?.url || result?.remoteUrl || "تم الرفع بنجاح"));
+      appendLog("GitHub: " + ("url" in result ? result.url : result.remoteUrl || "تم الرفع بنجاح"));
     } catch (error: any) {
       appendLog("تعذر الحفظ على GitHub: " + (error?.message || String(error)));
     } finally {
