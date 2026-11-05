@@ -16,14 +16,35 @@ function StudioPreview() {
 
   useEffect(() => {
     let alive = true;
+    let unsubscribe: (() => void) | undefined;
+    let channel: BroadcastChannel | null = null;
+
     studioService.syncWithServerInBackground("local-user").then(result => {
       if (alive) { setDraft(result.draft); setIsReady(true); }
     }).catch(() => setIsReady(true));
-    let unsubscribe: (() => void) | undefined;
+
     studioService.subscribe(next => {
       if (alive) setDraft(next.draft);
     }).then(fn => { unsubscribe = fn; });
-    return () => { alive = false; unsubscribe?.(); };
+
+    // The editor and preview run in separate same-origin JS contexts.
+    // Re-hydrate their shared local IndexedDB/localStorage state after each editor save.
+    if (typeof BroadcastChannel !== "undefined") {
+      channel = new BroadcastChannel("developer-studio-independent-updates");
+      channel.addEventListener("message", () => {
+        studioService.refreshFromStorage().then(nextDraft => {
+          if (alive) setDraft(nextDraft);
+        }).catch(() => {
+          // Keep the last rendered local draft when storage is temporarily unavailable.
+        });
+      });
+    }
+
+    return () => {
+      alive = false;
+      unsubscribe?.();
+      channel?.close();
+    };
   }, []);
 
   const page = useMemo(() => {

@@ -310,19 +310,32 @@ function notify() {
   if (!state) return;
   const safe = clone(state);
   subscribers.forEach(listener => listener(safe));
-  if (typeof BroadcastChannel !== "undefined") {
-    const channel = new BroadcastChannel("developer-studio-independent-updates");
-    channel.postMessage({ updatedAt: safe.draft.updatedAt, revision: safe.publishedConfig.revision });
-    channel.close();
-  }
+}
+
+function broadcastUpdate(snapshot: LocalState) {
+  if (typeof BroadcastChannel === "undefined") return;
+  const channel = new BroadcastChannel("developer-studio-independent-updates");
+  channel.postMessage({
+    updatedAt: snapshot.draft.updatedAt,
+    revision: snapshot.publishedConfig.revision,
+  });
+  channel.close();
 }
 
 function persist() {
   if (!state) return;
   const snapshot = clone(state);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot)); } catch { /* IndexedDB remains the primary store */ }
-  writeQueue = writeQueue.catch(() => undefined).then(() => writeIndexedState(snapshot)).catch(() => undefined);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+  } catch {
+    // IndexedDB remains the primary store when localStorage quota is exceeded.
+  }
   notify();
+  writeQueue = writeQueue
+    .catch(() => undefined)
+    .then(() => writeIndexedState(snapshot))
+    .catch(() => undefined)
+    .then(() => broadcastUpdate(snapshot));
 }
 
 function ensureState(): LocalState {
@@ -689,6 +702,33 @@ export const studioService = {
   async subscribe(listener: (next: LocalState) => void) {
     subscribers.add(listener);
     return () => { subscribers.delete(listener); };
+  },
+
+  async refreshFromStorage() {
+    // Read the latest shared browser workspace in this iframe/tab context.
+    // This method intentionally notifies local subscribers without rebroadcasting,
+    // preventing BroadcastChannel feedback loops between editor and preview.
+    await writeQueue;
+    const localSnapshot = readLocalCache();
+    let indexedSnapshot: LocalState | null = null;
+    try {
+      indexedSnapshot = await readIndexedState();
+    } catch {
+      // localStorage remains a usable fallback.
+    }
+
+    const candidates = [localSnapshot, indexedSnapshot].filter(
+      (candidate): candidate is LocalState => Boolean(candidate?.draft?.pages && candidate?.draft?.elements)
+    );
+    const latest = candidates.sort(
+      (a, b) => Date.parse(b.draft.updatedAt || "") - Date.parse(a.draft.updatedAt || "")
+    )[0];
+
+    if (latest) state = clone(latest);
+    const current = ensureState();
+    const safe = clone(current);
+    subscribers.forEach(listener => listener(safe));
+    return clone(current.draft);
   },
 
   async waitForPersistence() {
