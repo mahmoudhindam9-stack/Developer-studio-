@@ -96,7 +96,7 @@ async function importProjectArchive(){
  let expandedBytes=0;
  const extracted=[];
  for(const entry of entries){
-  const normalized=String(entry.name||'').replace(/\\/g,'/');
+  const normalized=String(entry.unsafeOriginalName||entry.name||'').replace(/\\/g,'/');
   const parts=normalized.split('/').filter(Boolean);
   if(!parts.length||normalized.startsWith('/')||/^[a-zA-Z]:/.test(normalized)||parts.some(p=>p==='.'||p==='..'))throw Error('Unsafe path found in ZIP archive: '+entry.name);
   const mode=Number(entry.unixPermissions||0);
@@ -202,21 +202,32 @@ async function saveProjectToGithub(options={}){
  if(task)throw Error('Stop the running project task before saving to GitHub.');
  const remoteInput=String(options.remoteUrl||'').trim();
  const requestedBranch=String(options.branch||'').trim();
- await ensureGitRepo(requestedBranch||'main');
- const currentBranch=await gitResult(['branch','--show-current']);
- const branchName=requestedBranch||currentBranch.stdout.trim()||'main';
  const message=String(options.message||'Update project from Developer Studio').trim().slice(0,160);
  if(!message)throw Error('Enter a commit message.');
- if(!currentBranch.stdout.trim()||requestedBranch)await git(['branch','-M',branchName]);
+ let remote=remoteInput?validateGithubRemote(remoteInput):'';
+ const hasGit=existsSync(path.join(root,'.git'));
+ if(!hasGit&&!remote)throw Error('This folder has no Git history. Enter the GitHub repository URL so Developer Studio can connect its history before pushing.');
+ if(!hasGit&&remote){
+  const temporaryClone=path.join(os.tmpdir(),'developer-studio-history-'+randomUUID());
+  try{
+   await runCli('git',['clone',remote,temporaryClone]);
+   await fs.cp(path.join(temporaryClone,'.git'),path.join(root,'.git'),{recursive:true,errorOnExist:true});
+  }finally{
+   await fs.rm(temporaryClone,{recursive:true,force:true}).catch(()=>undefined);
+  }
+ }
+ if(!existsSync(path.join(root,'.git')))await ensureGitRepo(requestedBranch||'main');
  const current=await gitResult(['remote','get-url','origin']);
- if(remoteInput){
-  const remote=validateGithubRemote(remoteInput);
+ if(remote){
   if(current.code===0)await git(['remote','set-url','origin',remote]);
   else await git(['remote','add','origin',remote]);
  }else if(current.code!==0)throw Error('This project has no origin remote. Enter the existing GitHub repository URL.');
+ const currentBranch=await gitResult(['branch','--show-current']);
+ const branchName=requestedBranch||currentBranch.stdout.trim()||'main';
+ if(!currentBranch.stdout.trim()||requestedBranch)await git(['branch','-M',branchName]);
  await stageAndCommit(message);
  const pushed=await gitResult(['push','-u','origin',branchName]);
- if(pushed.code!==0)throw Error(pushed.stderr||pushed.stdout||'GitHub push failed. Check your Git credentials and repository permissions.');
+ if(pushed.code!==0)throw Error(pushed.stderr||pushed.stdout||'GitHub push failed. Check your Git credentials, permissions, and whether the remote branch has unrelated changes.');
  const finalRemote=await git(['remote','get-url','origin']);
  return{success:true,remoteUrl:finalRemote,branch:branchName};
 }
